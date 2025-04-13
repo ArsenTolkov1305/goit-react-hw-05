@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import Navigation from "../Navigation/Navigation";
 import HomePage from "../../pages/HomePage";
 import MoviesPage from "../../pages/MoviesPage";
+import MovieDetailsPage from "../../pages/MovieDetailsPage";
 import css from "./App.module.css";
 
 export default function App() {
@@ -11,6 +12,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/movies" element={<MoviesPage />} />
+        <Route path="/movies/:movieId" element={<MovieDetailsPage />} />
       </Routes>
     </div>
   );
