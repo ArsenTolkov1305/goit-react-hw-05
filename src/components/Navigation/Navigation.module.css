@@ -1,0 +1,24 @@
+.nav {
+  display: flex;
+  gap: 15px;
+  width: 100%;
+  background-color: #0077dd;
+  padding: 10px;
+  border-radius: 5px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  margin-left: auto;
+  margin-right: auto;
+  border: 1px solid blue;
+}
+
+.link {
+  color: white;
+  text-decoration: none;
+}
+
+.activeLink {
+  color: blue;
+  text-decoration: underline;
+}
