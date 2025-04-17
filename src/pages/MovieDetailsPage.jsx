@@ -1,10 +1,10 @@
-import { useParams } from "react-router-dom";
+import { useParams, Link, Outlet } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import css from "./MovieDetailsPage.module.css";
 
 const API_URL = "https://api.themoviedb.org/3/movie";
-const API_KEY =
+const BEARER_TOKEN =
   "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzMGU5NWZmYTk0MmRhN2RjZjFlYzU4MTdmMGM1ZmE0MCIsIm5iZiI6MTc0NDU0MDE4My40MjQsInN1YiI6IjY3ZmI5MjE3ZWE4MGQ4NTE3NTlhMmM0MiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.cpuVF9RtdWnCZFZzhVH4EUF-X2LmeBajAwBEnXkbgqc";
 
 export default function MovieDetailsPage() {
@@ -14,7 +14,7 @@ export default function MovieDetailsPage() {
   useEffect(() => {
     axios
       .get(`${API_URL}/${movieId}?language=en-US`, {
-        headers: { Authorization: API_KEY },
+        headers: { Authorization: BEARER_TOKEN },
       })
       .then((response) => setMovie(response.data))
       .catch((err) => console.error(err));
@@ -34,6 +34,17 @@ export default function MovieDetailsPage() {
         <p>{movie.overview}</p>
         <p>Release Date: {movie.release_date}</p>
         <p>Rating: {movie.vote_average}</p>
+        <h2>Additional Information</h2>
+        <ul>
+          <li>
+            <Link to="cast">Cast</Link>
+          </li>
+          <li>
+            <Link to="reviews">Reviews</Link>
+          </li>
+        </ul>
+        {/* Вкладені маршрути рендеряться тут */}
+        <Outlet />
       </div>
     </div>
   );
