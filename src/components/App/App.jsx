@@ -9,7 +9,6 @@ import Navigation from "../Navigation/Navigation";
 // import NotFoundPage404 from "../../pages/NotFoundPage.jsx"
 import css from "./App.module.css";
 
-const Loader = () => <div className="loader">Loading...</div>;
 const HomePage = lazy(() => import("../../pages/HomePage"));
 const MoviesPage = lazy(() => import("../../pages/MoviesPage"));
 const MovieDetailsPage = lazy(() => import("../../pages/MovieDetailsPage"));
@@ -21,18 +20,17 @@ export default function App() {
   return (
     <div className={css.container}>
       <Navigation className={css.nav} />
-      <Suspense fallback={<Loader />} />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/movies" element={<MoviesPage />} />
-        <Route path="/movies/:movieId" element={<MovieDetailsPage />}>
-          <Route path="cast" element={<MovieCast />} />
-          <Route path="reviews" element={<MovieReviews />} />
-        </Route>
-        <Route path="*" element={<NotFoundPage404 />}></Route>
-      </Routes>
+      <Suspense fallback={<div>Loading..</div>}>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/movies" element={<MoviesPage />} />
+          <Route path="/movies/:movieId" element={<MovieDetailsPage />}>
+            <Route path="cast" element={<MovieCast />} />
+            <Route path="reviews" element={<MovieReviews />} />
+          </Route>
+          <Route path="*" element={<NotFoundPage404 />}></Route>
+        </Routes>
+      </Suspense>
     </div>
   );
 }
-
-// TODO: Треба ще зробити сторінку 404 а також ось ту штуку з кодом (поділ коду)

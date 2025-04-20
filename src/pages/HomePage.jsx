@@ -1,43 +1,29 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import axios from "axios";
-import css from "./HomePage.module.css";
-
-const TRENDING_API_URL = "https://api.themoviedb.org/3/trending/movie/day";
-const BEARER_TOKEN =
-  "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzMGU5NWZmYTk0MmRhN2RjZjFlYzU4MTdmMGM1ZmE0MCIsIm5iZiI6MTc0NDU0MDE4My40MjQsInN1YiI6IjY3ZmI5MjE3ZWE4MGQ4NTE3NTlhMmM0MiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.cpuVF9RtdWnCZFZzhVH4EUF-X2LmeBajAwBEnXkbgqc";
+import MovieList from "../components/MovieList/MovieList";
 
 export default function HomePage() {
-  const [movies, setMovies] = useState([]);
+  const [trendingMovies, setTrendingMovies] = useState([]);
 
   useEffect(() => {
-    axios
-      .get(TRENDING_API_URL, {
-        headers: { Authorization: BEARER_TOKEN },
-      })
-      .then((response) => {
-        setMovies(response.data.results); // Зберігаємо список трендових фільмів
-      })
-      .catch((err) => console.error(err));
+    const fetchTrendingMovies = async () => {
+      try {
+        const response = await axios.get(
+          "https://api.themoviedb.org/3/trending/all/day?api_key=30e95ffa942da7dcf1ec5817f0c5fa40",
+        );
+        setTrendingMovies(response.data.results);
+      } catch (error) {
+        console.error("Error fetching trending movies:", error);
+      }
+    };
+
+    fetchTrendingMovies();
   }, []);
 
   return (
-    <main>
-      <h1>Trending Movies</h1>
-      <ul className={css.list}>
-        {movies.map((movie) => (
-          <li key={movie.id} className={css.item}>
-            <Link to={`/movies/${movie.id}`} className={css.link}>
-              <img
-                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                alt={movie.title}
-                className={css.poster}
-              />
-              <h3>{movie.title}</h3>
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </main>
+    <div>
+      <h1>Trending today</h1>
+      <MovieList movies={trendingMovies} />
+    </div>
   );
 }

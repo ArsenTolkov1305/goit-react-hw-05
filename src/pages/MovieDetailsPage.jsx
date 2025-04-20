@@ -1,40 +1,57 @@
-import { useParams, Link, Outlet } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useParams, Link, Outlet, useLocation } from "react-router-dom";
 import axios from "axios";
-import css from "./MovieDetailsPage.module.css";
-
-const API_URL = "https://api.themoviedb.org/3/movie";
-const BEARER_TOKEN =
-  "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzMGU5NWZmYTk0MmRhN2RjZjFlYzU4MTdmMGM1ZmE0MCIsIm5iZiI6MTc0NDU0MDE4My40MjQsInN1YiI6IjY3ZmI5MjE3ZWE4MGQ4NTE3NTlhMmM0MiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.cpuVF9RtdWnCZFZzhVH4EUF-X2LmeBajAwBEnXkbgqc";
 
 export default function MovieDetailsPage() {
   const { movieId } = useParams();
   const [movie, setMovie] = useState(null);
+  const location = useLocation();
+  const backLinkRef = useRef(location.state?.from || "/");
 
   useEffect(() => {
-    axios
-      .get(`${API_URL}/${movieId}?language=en-US`, {
-        headers: { Authorization: BEARER_TOKEN },
-      })
-      .then((response) => setMovie(response.data))
-      .catch((err) => console.error(err));
+    const fetchMovieDetails = async () => {
+      try {
+        const response = await axios.get(
+          `https://api.themoviedb.org/3/movie/${movieId}?api_key=30e95ffa942da7dcf1ec5817f0c5fa40`,
+        );
+        setMovie(response.data);
+      } catch (error) {
+        console.error("Error fetching movie details:", error);
+      }
+    };
+
+    fetchMovieDetails();
   }, [movieId]);
 
-  if (!movie) return <p>Loading...</p>;
+  if (!movie) return <div>Loading...</div>;
+
+  const posterStyle = {
+    maxHeight: "400px", // Обмежуємо висоту постера
+    width: "auto",
+  };
 
   return (
-    <div className={css.details}>
-      <img
-        src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-        alt={movie.title}
-        className={css.poster}
-      />
+    <div>
+      <Link to={backLinkRef.current}>← Go back</Link>
+      <div style={{ display: "flex", margin: "20px 0" }}>
+        {movie.poster_path && (
+          <img
+            src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+            alt={movie.title}
+            style={posterStyle}
+          />
+        )}
+        <div style={{ marginLeft: "20px" }}>
+          <h1>{movie.title}</h1>
+          <p>User Score: {Math.round(movie.vote_average * 10)}%</p>
+          <h2>Overview</h2>
+          <p>{movie.overview}</p>
+          <h2>Genres</h2>
+          <p>{movie.genres.map((genre) => genre.name).join(", ")}</p>
+        </div>
+      </div>
       <div>
-        <h1>{movie.title}</h1>
-        <p>{movie.overview}</p>
-        <p>Release Date: {movie.release_date}</p>
-        <p>Rating: {movie.vote_average}</p>
-        <h2>Additional Information</h2>
+        <h3>Additional information</h3>
         <ul>
           <li>
             <Link to="cast">Cast</Link>
@@ -43,9 +60,8 @@ export default function MovieDetailsPage() {
             <Link to="reviews">Reviews</Link>
           </li>
         </ul>
-        {/* Вкладені маршрути рендеряться тут */}
-        <Outlet />
       </div>
+      <Outlet />
     </div>
   );
 }

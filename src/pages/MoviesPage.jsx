@@ -1,32 +1,44 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
+import axios from "axios";
 import MovieList from "../components/MovieList/MovieList";
-import css from "./MoviesPage.module.css";
 
 export default function MoviesPage() {
-  const [query, setQuery] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [movies, setMovies] = useState([]);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const query = searchParams.get("query") || "";
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setSearchQuery(query); // Оновлюємо пошуковий запит
+    const form = e.currentTarget;
+    const searchQuery = form.elements.query.value;
+    setSearchParams(searchQuery !== "" ? { query: searchQuery } : {});
   };
 
+  useEffect(() => {
+    if (!query) return;
+
+    const searchMovies = async () => {
+      try {
+        const response = await axios.get(
+          `https://api.themoviedb.org/3/search/movie?api_key=30e95ffa942da7dcf1ec5817f0c5fa40&query=${query}`,
+        );
+        setMovies(response.data.results);
+      } catch (error) {
+        console.error("Error searching movies:", error);
+      }
+    };
+
+    searchMovies();
+  }, [query]);
+
   return (
-    <main>
-      <h1>Search Movies</h1>
-      <form onSubmit={handleSubmit} className={css.form}>
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Enter movie name"
-          className={css.input}
-        />
-        <button type="submit" className={css.button}>
-          Search
-        </button>
+    <div>
+      <form onSubmit={handleSubmit}>
+        <input type="text" name="query" defaultValue={query} />
+        <button type="submit">Search</button>
       </form>
-      <MovieList searchQuery={searchQuery} />
-    </main>
+      {movies.length > 0 && <MovieList movies={movies} />}
+    </div>
   );
 }
